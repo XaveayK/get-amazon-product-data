@@ -33,5 +33,4 @@ if __name__ == "__main__":
     print(excelBook.worksheets[0].max_column)
     p1 = product("AHHHHHHH", excelBook.worksheets[0])
     p1.setASIN("baltimores")
-    
     excelBook.save(filename="aTest.xlsx")
