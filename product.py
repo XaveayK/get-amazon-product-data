@@ -28,6 +28,13 @@ class product:
     def setPrice(self, price):
         self.price = price
 
+    def getCol(self):
+        return self.col
+
+    async def shiftCol(self, originCol):
+        if self.col > originCol:
+            self.col-= 1
+
     # Gets the price in the excel sheet
     def currPrice(self):
         return self.price

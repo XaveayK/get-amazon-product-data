@@ -33,8 +33,14 @@ class amazonProducts:
             self.products[title] = item
             self.wb.save(filename=self.fileName)
 
-    def remProduct(name):
-        pass
+    async def remProduct(self, title):
+        if title in self.products.keys():
+            colNum = self.products[title].getCol()
+            self.wb.worksheets[0].delete_cols(colNum)
+            self.products.pop(title)
+
+            for entry in self.products.values():
+                await entry.shiftCol(colNum)
 
     async def updatePricing(self):
         opts = webdriver.chrome.options.Options()
@@ -54,6 +60,8 @@ class amazonProducts:
 
         if value != 1:
             self.wb.save(filename=self.fileName)
+            return 1
+        else: return 0
     
     def __str__(self):
         string = ""
