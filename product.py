@@ -1,16 +1,21 @@
 import openpyxl
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+
 class product:
     
     def __init__(self, title, URI, excelSheet, keys=None):
         self.title = title
         self.sheet = excelSheet
         self.URI = URI
-        self.col = self.sheet.max_column+1
-        print(keys)
-        if keys == None or title not in keys[0]:
+        if keys == None or self.title not in keys:
+            self.col = self.sheet.max_column+1
             self.sheet.cell(2, self.col).value = self.title
             self.sheet.cell(3, self.col).value = self.URI
+        else:
+            self.col = keys.index(self.title)
 
     # Purpose: Sets URI in case it must be updated\
     # Params:  URI - The uri of the of the item
@@ -29,19 +34,13 @@ class product:
 
     async def getPriceFromPage(self, driver=webdriver):
         driver.get(self.URI)
-        result = None
-        while result == None:
-            try:
-                self.price = driver.find_element(webdriver.common.by.By.CLASS_NAME, "a-price-whole").text
-                result = 1
-            except: pass
+        delay = 3
+        try: self.price = WebDriverWait(driver, delay).until(EC.presence_of_element_located((webdriver.common.by.By.CLASS_NAME, "a-price-whole"))).text
+        except TimeoutException: return 1
         self.price+= "."
-        while result == 1:
-            try:
-                self.price+= driver.find_element(webdriver.common.by.By.CLASS_NAME, "a-price-fraction").text
-                result = 2
-            except: pass
-        self.sheet.cell(self.sheet.max_row, self.col).value = self.price
+        try: self.price+= WebDriverWait(driver, delay).until(EC.presence_of_element_located((webdriver.common.by.By.CLASS_NAME, "a-price-fraction"))).text
+        except TimeoutException: return 1
+        self.sheet.cell(self.sheet.max_row, self.col).value = float(self.price.replace(",", ""))
         return
 
     # Returns title and URI
@@ -64,10 +63,3 @@ if __name__ == "__main__":
     p1 = product("AHHHHHHH", excelBook.worksheets[0])
     p1.setURI("baltimores")
     excelBook.save(filename="aTest.xlsx")
-
-    options = webdriver.Options()
-    options.add_argument('--ignore-certificate-errors')
-    options.add_argument("--window-size=200,200")
-    #Gets the page open
-    driver = webdriver.Chrome(executable_path = "chromedriver", chrome_options = options)
-    driver.get(URI)
