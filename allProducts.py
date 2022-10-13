@@ -4,7 +4,7 @@ from product import webdriver
 from datetime import date
 from functools import reduce
 import asyncio
-from openpyxl.styles import NamedStyle
+import datetime
 
 class amazonProducts:
     def __init__(self, fileName="products.xlsx"):
@@ -36,11 +36,13 @@ class amazonProducts:
     async def remProduct(self, title):
         if title in self.products.keys():
             colNum = self.products[title].getCol()
-            self.wb.worksheets[0].delete_cols(colNum)
+            self.wb.worksheets[0].delete_cols(colNum, 1)
             self.products.pop(title)
 
             for entry in self.products.values():
                 await entry.shiftCol(colNum)
+
+            self.wb.save(filename=self.fileName)
 
     async def updatePricing(self):
         opts = webdriver.chrome.options.Options()
@@ -52,7 +54,7 @@ class amazonProducts:
         opts.add_argument("--disable-gpu")
         driver = webdriver.Chrome(executable_path = "chromedriver", options = opts)
 
-        self.wb.worksheets[0].cell(self.wb.worksheets[0].max_row + 1, 2).value = NamedStyle(name='datetime', number_format="DD/MM/YYYY")
+        self.wb.worksheets[0].cell(self.wb.worksheets[0].max_row + 1, 2).value = str(datetime.datetime.today().strftime('%d-%m-%Y'))
 
         for product in self.products.values():
             value = await product.getPriceFromPage(driver)
@@ -66,8 +68,7 @@ class amazonProducts:
     def __str__(self):
         string = ""
         for product in self.products.values():
-            string += str(product)
-            string += "\n"
+            string += f"{product}\n"
         return string
 
     

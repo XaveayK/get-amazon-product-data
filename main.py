@@ -1,7 +1,7 @@
 import sys
 import allProducts
 import asyncio
-
+import time
 if __name__ == "__main__":
     arg = sys.argv
     products = allProducts.amazonProducts()
@@ -15,4 +15,4 @@ if __name__ == "__main__":
     elif arg[1].lower() == "-a":
         products.addProduct(arg[2], arg[3])
     elif arg[1].lower() == "-r":
-        products.remProduct(arg[2])
+        asyncio.run(products.remProduct(arg[2]))

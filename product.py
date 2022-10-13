@@ -15,15 +15,15 @@ class product:
             self.sheet.cell(2, self.col).value = self.title
             self.sheet.cell(3, self.col).value = self.URI
         else:
-            self.col = keys.index(self.title)
+            self.col = keys.index(self.title) + 3
 
-    # Purpose: Sets URI in case it must be updated\
+    # Purpose: Sets URI in case it must be updated
     # Params:  URI - The uri of the of the item
     def setURI(self, URI):
         self.URI = URI
         self.sheet.cell(3, self.col).value = URI
     
-    # Purpose: To input a price directyl
+    # Purpose: To input a price directly
     # Usage:   Used when recreating already existing entries from excel
     def setPrice(self, price):
         self.price = price
@@ -35,7 +35,6 @@ class product:
         if self.col > originCol:
             self.col-= 1
 
-    # Gets the price in the excel sheet
     def currPrice(self):
         return self.price
 
@@ -52,12 +51,7 @@ class product:
 
     # Returns title and URI
     def __str__(self):
-        string = "Title: "
-        string+= self.title
-        string+= "\nURI: "
-        string+= self.URI
-        string+= "\n"
-        return string
+        return f"Title: {self.title}\nURI: {self.URI}\n"
 
 
 if __name__ == "__main__":
